@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ニンニク入れますか？ - 激闘の厨房</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --jiro-yellow: #fcd116;
+            --jiro-black: #111111;
+            --jiro-red: #d32f2f;
+            --wood-dark: #3e2419;
+            --wood-light: #4b2c20;
+        }
+
+        * { box-sizing: border-box; user-select: none; }
+
+        body {
+            margin: 0; background: #000; color: white;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow: hidden; touch-action: none;
+        }
+
+        /* --- 画面レイアウト --- */
+        #game-container, #start-screen, #result-screen {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- スタート・リザルト画面（看板風） --- */
+        #start-screen, #result-screen {
+            background: var(--jiro-yellow); color: var(--jiro-black);
+            justify-content: center; align-items: center; z-index: 100;
+            border: 15px solid var(--jiro-black);
+        }
+        #result-screen { display: none; background: #111; color: #fff; border-color: var(--jiro-red); }
+        
+        .title-logo { font-size: 3.5rem; text-align: center; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
+        .action-btn {
+            background: var(--jiro-red); color: white; border: none; padding: 20px 50px;
+            font-size: 1.8rem; font-weight: 900; border-radius: 5px; cursor: pointer;
+            box-shadow: 0 6px 0 #8b0000; transition: 0.1s;
+        }
+        .action-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #8b0000; }
+
+        /* --- HUD (タイマー・スコア) --- */
+        #hud {
+            display: flex; justify-content: space-between; padding: 10px 20px;
+            background: var(--jiro-black); border-bottom: 4px solid var(--jiro-yellow);
+            font-size: 1.2rem; font-weight: 900; color: var(--jiro-yellow);
+        }
+        .timer-flash { animation: flash-red 0.3s; }
+        @keyframes flash-red { from { color: red; transform: scale(1.2); } to { color: var(--jiro-yellow); transform: scale(1); } }
+
+        /* --- 客のセリフエリア --- */
+        #customer-zone { height: 22%; background: #222; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        #speech-bubble {
+            background: white; color: black; padding: 15px; border-radius: 8px;
+            width: 100%; max-width: 600px; border: 4px solid var(--jiro-yellow);
+            position: relative; min-height: 100px; font-weight: 700; line-height: 1.4;
+        }
+
+        /* --- 厨房・汚れた木目カウンター --- */
+        #kitchen-view {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            background: 
+                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                repeating-linear-gradient(90deg, var(--wood-light) 0px, var(--wood-light) 40px, var(--wood-dark) 41px, var(--wood-dark) 80px);
+            position: relative; box-shadow: inset 0 20px 50px rgba(0,0,0,0.8);
+        }
+        #kitchen-view::after {
+            content: ''; position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle at 30% 40%, rgba(0,0,0,0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(0,0,0,0.2) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* --- 重厚な丼 --- */
+        #bowl-container { position: relative; width: 340px; height: 220px; filter: drop-shadow(0 30px 40px rgba(0,0,0,0.9)); }
+        #bowl-side {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: #ccc; border: 2px solid #999; transform: translateY(15px);
+        }
+        #bowl-rim {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            background: #eee; border: 12px solid #ddd; box-shadow: inset 0 -10px 10px rgba(0,0,0,0.2);
+        }
+        #bowl-inside {
+            position: absolute; top: 12px; left: 12px; width: calc(100% - 24px); height: calc(100% - 24px);
+            border-radius: 50%; background: #4a220a; box-shadow: inset 0 20px 30px rgba(0,0,0,0.9); overflow: hidden;
+        }
+        #karame-layer { position: absolute; width: 100%; height: 100%; transition: 0.3s; }
+
+        /* --- 具材 --- */
+        #yasai-layer {
+            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 200px; height: 160px; border-radius: 50% 50% 20% 20% / 80% 80% 20% 20%;
+            background: radial-gradient(circle at 50% 20%, #f4f7dc 0%, #d8e2a1 50%, #8a964a 100%);
+            box-shadow: inset -5px -10px 30px rgba(0,0,0,0.5), 0 15px 20px rgba(0,0,0,0.7);
+            z-index: 2; opacity: 0; transform-origin: bottom center;
+        }
+        #ninniku-layer {
+            position: absolute; bottom: 35px; left: 70px; transform: scale(0);
+            width: 80px; height: 60px; border-radius: 45%;
+            background: #fff9c4;
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.1) 1px, transparent 1px);
+            background-size: 5px 5px;
+            box-shadow: inset -4px -4px 10px rgba(139,112,0,0.4), 3px 5px 12px rgba(0,0,0,0.8);
+            z-index: 3; opacity: 0;
+        }
+        #abura-layer {
+            position: absolute; top: 10%; left: 50%; transform: translateX(-50%) scale(0);
+            width: 160px; height: 100px;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,250,220,0.7) 40%, transparent 70%);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; 
+            filter: blur(1px) drop-shadow(0 10px 10px rgba(0,0,0,0.4));
+            z-index: 4; opacity: 0;
+        }
+
+        /* --- 操作パネル --- */
+        #control-panel { height: 35%; background: var(--jiro-yellow); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
+        .control-col { background: var(--jiro-black); display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; }
+        .col-header { text-align: center; background: #333; color: white; padding: 5px 0; font-size: 0.9rem; font-weight: 700; }
+        .btn-zone { flex: 1; display: flex; justify-content: center; align-items: center; color: #555; font-size: 1.3rem; font-weight: 900; cursor: pointer; border-bottom: 1px solid #222; }
+        .btn-zone.active { background: var(--jiro-yellow); color: var(--jiro-black); }
+
+    </style>
+</head>
+<body>
+
+<div id="start-screen">
+    <div class="title-logo">ニンニク<br>入れますか？</div>
+    <button class="action-btn" id="start-btn">営業開始</button>
+</div>
+
+<div id="result-screen">
+    <div class="title-logo" style="color:var(--jiro-yellow);">営業終了</div>
+    <div style="font-size:1.5rem; text-align:center;">本日のお客さま</div>
+    <div style="font-size:5rem; font-weight:900; color:var(--jiro-yellow);" id="final-score">0</div>
+    <button class="action-btn" id="retry-btn">もう一度</button>
+</div>
+
+<div id="game-container" style="display:none;">
+    <div id="hud">
+        <div id="timer-box">時間: <span id="time">90</span></div>
+        <div>捌いた数: <span id="score">0</span></div>
+    </div>
+    <div id="customer-zone">
+        <div id="speech-bubble"><div id="speech-text"></div></div>
+    </div>
+    <div id="kitchen-view">
+        <div id="bowl-container">
+            <div id="bowl-side"></div>
+            <div id="bowl-rim"></div>
+            <div id="bowl-inside"><div id="karame-layer"></div></div>
+            <div id="yasai-layer"></div>
+            <div id="ninniku-layer"></div>
+            <div id="abura-layer"></div>
+        </div>
+    </div>
+    <div id="control-panel">
+        <div class="control-col" data-type="ninniku">
+            <div class="col-header">ニンニク</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">抜き</div>
+        </div>
+        <div class="control-col" data-type="yasai">
+            <div class="col-header">ヤサイ</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">少なめ</div>
+        </div>
+        <div class="control-col" data-type="abura">
+            <div class="col-header">アブラ</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">抜き</div>
+        </div>
+        <div class="control-col" data-type="karame">
+            <div class="col-header">カラメ</div>
+            <div class="btn-zone" data-val="2">カラメ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">薄め</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // キャラクターレパートリー（「普通」という表現を排除し、プレイヤーに察しさせる）
+    const orderDataList = [
+        { char: "初心者", phrases: [{ text: "えっと、ヤサイマシで、", req: { y: 2 } }, { text: "ニンニク抜き…", req: { n: 0 } }, { text: "以上です！", req: { fill: true } }] },
+        { char: "無口な男", phrases: [{ text: "……", req: {} }, { text: "……", req: {} }, { text: "（コクリと頷く）", req: { fill: true } }] },
+        { char: "限界学生", phrases: [{ text: "全マシ！！", req: { n:2,y:2,a:2,k:2 } }] },
+        { char: "お嬢様", phrases: [{ text: "お野菜を控えめに…", req: { y: 0 } }, { text: "油も、お味も控えめでよろしいわ。", req: { a:0, k:0 } }, { text: "よろしくて？", req: { fill: true } }] },
+        { char: "泥酔客", phrases: [{ text: "カラメッ！味を濃くっ！", req: { k: 2 } }, { text: "野菜はいらねえ…", req: { y: 0 } }, { text: "……寝るわ。", req: { fill: true } }] },
+        { char: "伝説の漢", phrases: [{ text: "ニンニクマシマシ…", req: { n: 2 } }, { text: "アブラマシマシ…", req: { a: 2 } }, { text: "ヤサイ……マシだッ！", req: { y: 2 } }, { text: "押忍！", req: { fill: true } }] },
+        { char: "アスリート", phrases: [{ text: "野菜を山盛りに。", req: { y: 2 } }, { text: "脂は徹底排除！", req: { a: 0 } }, { text: "以上だ。", req: { fill: true } }] },
+        { char: "サラリーマン", phrases: [{ text: "明日は会議なんで、ニンニク抜きで。", req: { n: 0 } }, { text: "以上でお願いします。", req: { fill: true } }] },
+        { char: "若手社員", phrases: [{ text: "アブラ抜きで！", req: { a: 0 } }, { text: "カラメでお願いします！", req: { k: 2 } }, { text: "以上ッス！", req: { fill: true } }] },
+        { char: "常連客A", phrases: [{ text: "ヤサイ……", req: { y: 2 } }, { text: "アブラ。", req: { a: 2 } }, { text: "（ジッと見つめてくる）", req: { fill: true } }] },
+        { char: "常連客B", phrases: [{ text: "ニンニクカラメ。", req: { n: 2, k: 2 } }, { text: "（無言で待っている）", req: { fill: true } }] },
+        { char: "カップル（男）", phrases: [{ text: "彼女の前だから匂うのはちょっと…", req: { n: 0 } }, { text: "でもガッツリ食いたいんで野菜は山盛りで！", req: { y: 2 } }, { text: "これで！", req: { fill: true } }] },
+        { char: "ベテラン", phrases: [{ text: "アブラマシマシ、", req: { a: 2 } }, { text: "カラメ。", req: { k: 2 } }, { text: "……", req: { fill: true } }] }
+    ];
+
+    let score = 0, timeLeft = 90, timerInterval = null, isPlaying = false;
+    let currentCustomer = null, currentPhraseIndex = 0, currentStatus = { n:null, y:null, a:null, k:null };
+    let isTyping = false, currentTextStr = "";
+
+    function startGame() {
+        isPlaying = true;
+        score = 0; 
+        timeLeft = 90;
+        document.getElementById('score').innerText = score;
+        document.getElementById('time').innerText = timeLeft;
+        startCustomer();
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimeDisplay();
+            if(timeLeft <= 0) endGame();
+        }, 1000);
+    }
+
+    function endGame() {
+        isPlaying = false;
+        clearInterval(timerInterval);
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'flex';
+        document.getElementById('final-score').innerText = score;
+    }
+
+    function updateTimeDisplay() {
+        if(timeLeft < 0) timeLeft = 0;
+        document.getElementById('time').innerText = timeLeft;
+    }
+
+    function startCustomer() {
+        currentStatus = { n:null, y:null, a:null, k:null };
+        document.querySelectorAll('.btn-zone').forEach(b => b.classList.remove('active'));
+        updateBowl(null, null, null, true);
+        currentCustomer = orderDataList[Math.floor(Math.random() * orderDataList.length)];
+        currentPhraseIndex = 0;
+        currentTextStr = `【${currentCustomer.char}】\n`;
+        showPhrase();
+    }
+
+    function showPhrase() {
+        isTyping = true;
+        const text = currentCustomer.phrases[currentPhraseIndex].text;
+        let i = 0;
+        const timer = setInterval(() => {
+            document.getElementById('speech-text').innerText = currentTextStr + text.substring(0, i+1);
+            if(++i >= text.length) { 
+                clearInterval(timer); 
+                currentTextStr += text; 
+                isTyping = false; 
+                checkMatch(); 
+            }
+        }, 30);
+    }
+
+    function setVal(type, val) {
+        if(!isPlaying || !currentCustomer) return; 
+
+        const key = { ninniku:'n', yasai:'y', abura:'a', karame:'k' }[type];
+        const old = currentStatus[key];
+        currentStatus[key] = val;
+
+        // UI更新
+        document.querySelectorAll(`.control-col[data-type="${type}"] .btn-zone`).forEach(b => {
+            b.classList.toggle('active', parseInt(b.dataset.val) === val);
+        });
+
+        // ペナルティ判定（間違えたら即座に減点）
+        const phrase = currentCustomer.phrases[currentPhraseIndex];
+        const target = phrase.req.fill ? 1 : phrase.req[key];
+
+        if(target !== undefined && val !== target) {
+            applyPenalty(); 
+        }
+
+        updateBowl(key, old, val);
+        checkMatch();
+    }
+
+    // シビアになったペナルティ処理
+    function applyPenalty() {
+        timeLeft -= 5;
+        updateTimeDisplay();
+        const t = document.getElementById('timer-box');
+        t.classList.remove('timer-flash'); 
+        void t.offsetWidth; 
+        t.classList.add('timer-flash');
+        
+        if(timeLeft <= 0) endGame();
+    }
+
+    function checkMatch() {
+        if(isTyping || !currentCustomer) return;
+        const phrase = currentCustomer.phrases[currentPhraseIndex];
+        let ok = true;
+
+        if(phrase.req.fill) {
+            for(let k of ['n','y','a','k']) {
+                if(currentStatus[k] === null) ok = false;
+                else if(currentStatus[k] !== 1 && !wasRequestedBefore(k)) ok = false;
+            }
+        } else {
+            for(let k in phrase.req) if(currentStatus[k] !== phrase.req[k]) ok = false;
+        }
+
+        if(ok) {
+            currentTextStr += " ✔\n";
+            currentPhraseIndex++;
+
+            if(currentPhraseIndex < currentCustomer.phrases.length) {
+                setTimeout(showPhrase, 200);
+            } else { 
+                score++; 
+                document.getElementById('score').innerText = score; 
+                currentCustomer = null; 
+                setTimeout(startCustomer, 500); 
+            }
+        }
+    }
+
+    function wasRequestedBefore(k) {
+        for(let i=0; i<=currentPhraseIndex; i++) {
+            if(currentCustomer.phrases[i].req[k] !== undefined) return true;
+        }
+        return false;
+    }
+
+    function updateBowl(key, old, val, reset=false) {
+        if(reset) {
+            ['yasai','ninniku','abura'].forEach(id => { 
+                const e = document.getElementById(id+'-layer'); 
+                e.style.opacity = 0; 
+                e.style.transform = 'scale(0)'; 
+            });
+            document.getElementById('karame-layer').style.backgroundColor = 'transparent';
+            return;
+        }
+        
+        const isUp = (val > (old || 0));
+        const e = document.getElementById(({n:'ninniku', y:'yasai', a:'abura', k:'karame'}[key]) + '-layer');
+        
+        if(key === 'k') {
+            e.style.backgroundColor = val === 2 ? 'rgba(0,0,0,0.6)' : (val === 0 ? 'rgba(255,255,255,0.1)' : 'transparent');
+        } else {
+            const sc = key === 'y' ? (val === 0 ? 0.6 : (val === 2 ? 1.3 : 1)) : (val === 2 ? 1.5 : 1);
+            const op = val === 0 ? 0 : (key === 'a' && val === 1 ? 0.5 : 1);
+            const baseTrans = key === 'n' ? '' : 'translateX(-50%) ';
+            
+            if(isUp) {
+                e.getAnimations().forEach(a => a.cancel());
+                e.animate([
+                    { transform: baseTrans + 'translateY(-50px) scale(' + sc + ')', opacity: 0 }, 
+                    { transform: baseTrans + 'scale(' + sc + ')', opacity: op }
+                ], { duration: 200 });
+            }
+            e.style.transform = baseTrans + `scale(${sc})`;
+            e.style.opacity = op;
+        }
+    }
+
+    document.querySelectorAll('.btn-zone').forEach(b => {
+        b.addEventListener('pointerdown', (e) => { 
+            e.preventDefault(); 
+            setVal(b.parentElement.dataset.type, parseInt(b.dataset.val)); 
+        });
+    });
+
+    document.getElementById('start-btn').onclick = () => { 
+        document.getElementById('start-screen').style.display = 'none'; 
+        document.getElementById('game-container').style.display = 'flex'; 
+        startGame(); 
+    };
+
+    document.getElementById('retry-btn').onclick = () => { 
+        document.getElementById('result-screen').style.display = 'none'; 
+        document.getElementById('game-container').style.display = 'flex'; 
+        startGame(); 
+    };
+</script>
+</body>
+</html>
