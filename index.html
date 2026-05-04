@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ニンニク入れますか？ - 激闘の厨房</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Reggae+One&family=Yuji+Syuku&display=swap" rel="stylesheet">
     <style>
         :root {
-            --jiro-yellow: #fcd116;
-            --jiro-black: #111111;
-            --jiro-red: #d32f2f;
+            --jiro-yellow: #ffcc00;
+            --jiro-red: #cc0000;
+            --jiro-black: #1a1a1a;
             --wood-dark: #3e2419;
             --wood-light: #4b2c20;
         }
@@ -17,8 +17,8 @@
         * { box-sizing: border-box; user-select: none; }
 
         body {
-            margin: 0; background: #000; color: white;
-            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0; background: var(--jiro-black); color: white;
+            font-family: 'Reggae One', 'Noto Sans JP', sans-serif;
             overflow: hidden; touch-action: none;
         }
 
@@ -28,102 +28,164 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- スタート・リザルト画面（看板風） --- */
+        /* --- スタート・リザルト画面 --- */
         #start-screen, #result-screen {
-            background: var(--jiro-yellow); color: var(--jiro-black);
+            background: repeating-conic-gradient(var(--jiro-yellow) 0 15deg, #e6b800 15deg 30deg);
+            color: var(--jiro-red);
             justify-content: center; align-items: center; z-index: 100;
-            border: 15px solid var(--jiro-black);
+            border: 15px solid var(--jiro-red);
         }
-        #result-screen { display: none; background: #111; color: #fff; border-color: var(--jiro-red); }
+        #result-screen { display: none; background: #111; color: #fff; border-color: var(--jiro-yellow); }
         
-        .title-logo { font-size: 3.5rem; text-align: center; line-height: 1.1; margin-bottom: 20px; font-weight: 900; }
-        .action-btn {
-            background: var(--jiro-red); color: white; border: none; padding: 20px 50px;
-            font-size: 1.8rem; font-weight: 900; border-radius: 5px; cursor: pointer;
-            box-shadow: 0 6px 0 #8b0000; transition: 0.1s;
+        .title-logo { 
+            font-family: 'Dela Gothic One', cursive; font-size: 3.5rem; text-align: center; line-height: 1.2; 
+            margin-bottom: 30px; 
+            text-shadow: 3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 6px 6px 0 var(--jiro-black); 
         }
-        .action-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #8b0000; }
+        
+        .btn-container { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
+        .action-btn {
+            background: var(--jiro-red); color: white; border: none; padding: 15px 20px;
+            font-family: 'Dela Gothic One', cursive; font-size: 1.5rem; border-radius: 5px; cursor: pointer;
+            box-shadow: 0 8px 0 #8b0000; transition: 0.1s; line-height: 1.3; border: 3px solid #fff;
+        }
+        .action-btn.pc-btn { background: #333; box-shadow: 0 8px 0 #000; }
+        .action-btn:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(0,0,0,0.5); }
+        .btn-subtext { font-family: 'Reggae One', sans-serif; font-size: 0.9rem; color: #ffcccc; text-shadow: none; }
+        .pc-btn .btn-subtext { color: #aaa; }
 
         /* --- HUD (タイマー・スコア) --- */
         #hud {
             display: flex; justify-content: space-between; padding: 10px 20px;
-            background: var(--jiro-black); border-bottom: 4px solid var(--jiro-yellow);
-            font-size: 1.2rem; font-weight: 900; color: var(--jiro-yellow);
+            background: var(--jiro-red); border-bottom: 6px solid var(--jiro-yellow);
+            font-family: 'Dela Gothic One', cursive; font-size: 1.5rem; color: #fff;
+            text-shadow: 2px 2px 0 #000;
         }
         .timer-flash { animation: flash-red 0.3s; }
-        @keyframes flash-red { from { color: red; transform: scale(1.2); } to { color: var(--jiro-yellow); transform: scale(1); } }
+        @keyframes flash-red { 0% { color: #fff; transform: scale(1); } 50% { color: #ffeb3b; transform: scale(1.3); } 100% { color: #fff; transform: scale(1); } }
 
-        /* --- 客のセリフエリア --- */
-        #customer-zone { height: 22%; background: #222; display: flex; align-items: center; justify-content: center; padding: 10px; }
-        #speech-bubble {
-            background: white; color: black; padding: 15px; border-radius: 8px;
-            width: 100%; max-width: 600px; border: 4px solid var(--jiro-yellow);
-            position: relative; min-height: 100px; font-weight: 700; line-height: 1.4;
+        /* --- ミス通知（ポップアップ） --- */
+        #miss-indicator {
+            position: absolute; top: 70px; left: 20px;
+            color: #ff3333; font-family: 'Dela Gothic One', cursive; font-size: 2.5rem;
+            text-shadow: 3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 5px 5px 0 #000;
+            opacity: 0; pointer-events: none; z-index: 200;
         }
+        .show-miss { animation: floatUp 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.5) rotate(-10deg); }
+            30% { transform: translateY(-30px) scale(1.2) rotate(5deg); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1) rotate(0deg); }
+        }
+
+        /* --- 客のセリフエリア（赤暖簾風） --- */
+        #customer-zone { 
+            height: 22%; display: flex; align-items: center; justify-content: center; padding: 10px; 
+            background: repeating-linear-gradient(45deg, #a00 0, #a00 10px, #800 10px, #800 20px);
+            border-bottom: 5px solid var(--jiro-yellow);
+        }
+        #speech-bubble {
+            background: rgba(255, 255, 255, 0.95); color: #000; padding: 15px; border-radius: 5px;
+            width: 100%; max-width: 600px; border: 4px solid var(--jiro-black);
+            position: relative; min-height: 110px; font-size: 1.1rem; line-height: 1.5; font-weight:bold;
+            box-shadow: 5px 5px 0 var(--jiro-black);
+        }
+        .itadakimasu { color: var(--jiro-red); font-family: 'Dela Gothic One', cursive; font-size: 1.5rem; animation: pop 0.3s ease-out; display: inline-block; }
+        @keyframes pop { 0% { transform: scale(0.5); opacity: 0;} 100% { transform: scale(1); opacity: 1;} }
 
         /* --- 厨房・汚れた木目カウンター --- */
         #kitchen-view {
-            flex: 1; display: flex; justify-content: center; align-items: center;
+            flex: 1; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px;
             background: 
-                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
                 repeating-linear-gradient(90deg, var(--wood-light) 0px, var(--wood-light) 40px, var(--wood-dark) 41px, var(--wood-dark) 80px);
             position: relative; box-shadow: inset 0 20px 50px rgba(0,0,0,0.8);
         }
-        #kitchen-view::after {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background: radial-gradient(circle at 30% 40%, rgba(0,0,0,0.2) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 60%, rgba(0,0,0,0.2) 0%, transparent 40%);
-            pointer-events: none;
+
+        /* --- ラーメン表示コンテナ --- */
+        #ramen-presentation {
+            position: relative; width: 340px; height: 320px;
+            display: flex; justify-content: center; align-items: flex-end;
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.8));
         }
 
-        /* --- 重厚な丼 --- */
-        #bowl-container { position: relative; width: 340px; height: 220px; filter: drop-shadow(0 30px 40px rgba(0,0,0,0.9)); }
-        #bowl-side {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            background: #ccc; border: 2px solid #999; transform: translateY(15px);
+        /* ユーザー提供の丼画像 */
+        #bowl-image {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 340px; height: auto; z-index: 1;
+            pointer-events: none; /* タッチ干渉防止 */
         }
-        #bowl-rim {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            background: #eee; border: 12px solid #ddd; box-shadow: inset 0 -10px 10px rgba(0,0,0,0.2);
-        }
-        #bowl-inside {
-            position: absolute; top: 12px; left: 12px; width: calc(100% - 24px); height: calc(100% - 24px);
-            border-radius: 50%; background: #4a220a; box-shadow: inset 0 20px 30px rgba(0,0,0,0.9); overflow: hidden;
-        }
-        #karame-layer { position: absolute; width: 100%; height: 100%; transition: 0.3s; }
 
-        /* --- 具材 --- */
+        /* カラメ（濃さ）を丼全体にかけるフィルタ */
+        #karame-layer { 
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 280px; height: 100px; border-radius: 50%;
+            background-color: rgba(0,0,0,0); transition: 0.3s; z-index: 2; pointer-events: none;
+        }
+
+        /* チャーシュー（肉）- 丼の中・手前寄りに配置 */
+        #buta-layer {
+            position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
+            width: 260px; height: 60px;
+            background: radial-gradient(ellipse at center, #9e5b40 0%, #63331b 100%);
+            border-radius: 40px; z-index: 3; opacity: 1; /* デフォルトで表示 */
+        }
+
+        /* ヤサイ（もやしの山）- 中央配置 */
         #yasai-layer {
-            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%) scale(0);
-            width: 200px; height: 160px; border-radius: 50% 50% 20% 20% / 80% 80% 20% 20%;
-            background: radial-gradient(circle at 50% 20%, #f4f7dc 0%, #d8e2a1 50%, #8a964a 100%);
-            box-shadow: inset -5px -10px 30px rgba(0,0,0,0.5), 0 15px 20px rgba(0,0,0,0.7);
-            z-index: 2; opacity: 0; transform-origin: bottom center;
+            position: absolute; bottom: 75px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 240px; height: 200px;
+            border-radius: 50% 50% 20% 20% / 70% 70% 30% 30%;
+            background-color: #f2ebd9; /* もやしベース */
+            background-image: 
+                /* キャベツの緑色を点在させる */
+                radial-gradient(circle at 30% 20%, #8bc34a 0, #8bc34a 15px, transparent 16px),
+                radial-gradient(circle at 75% 40%, #8bc34a 0, #8bc34a 12px, transparent 13px),
+                radial-gradient(circle at 45% 70%, #8bc34a 0, #8bc34a 20px, transparent 21px),
+                radial-gradient(circle at 20% 60%, #8bc34a 0, #8bc34a 10px, transparent 11px),
+                /* もやしの筋を再現 */
+                repeating-linear-gradient(75deg, transparent, transparent 8px, rgba(255,255,255,0.9) 9px, rgba(255,255,255,0.9) 11px),
+                repeating-linear-gradient(-65deg, transparent, transparent 12px, rgba(255,255,255,0.7) 13px, rgba(255,255,255,0.7) 15px);
+            box-shadow: inset -10px -15px 30px rgba(0,0,0,0.5), 0 10px 15px rgba(0,0,0,0.4);
+            z-index: 4; opacity: 0; transform-origin: bottom center;
         }
+
+        /* ニンニク（右下・黄色い粒々） */
         #ninniku-layer {
-            position: absolute; bottom: 35px; left: 70px; transform: scale(0);
-            width: 80px; height: 60px; border-radius: 45%;
-            background: #fff9c4;
-            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.1) 1px, transparent 1px);
-            background-size: 5px 5px;
-            box-shadow: inset -4px -4px 10px rgba(139,112,0,0.4), 3px 5px 12px rgba(0,0,0,0.8);
-            z-index: 3; opacity: 0;
+            position: absolute; bottom: 65px; left: 50%; transform: translateX(60px) scale(0);
+            width: 80px; height: 55px; border-radius: 40% 60% 50% 50%;
+            background-color: #ffe87c;
+            background-image: radial-gradient(circle at 3px 3px, #ccaa22 1px, transparent 1px);
+            background-size: 8px 8px;
+            box-shadow: inset -5px -5px 15px rgba(200,150,0,0.4), 2px 5px 10px rgba(0,0,0,0.6);
+            z-index: 5; opacity: 0; transform-origin: bottom center;
         }
+
+        /* アブラ（もやしの上・ドロッとした塊） */
         #abura-layer {
-            position: absolute; top: 10%; left: 50%; transform: translateX(-50%) scale(0);
-            width: 160px; height: 100px;
-            background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,250,220,0.7) 40%, transparent 70%);
+            position: absolute; 
+            /* 初期位置（JSでヤサイの量に合わせて動的にbottomを変更します） */
+            bottom: 150px; 
+            left: 50%; transform: translateX(-50%) scale(0);
+            width: 130px; height: 80px;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,245,215,0.8) 50%, transparent 70%);
             border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; 
-            filter: blur(1px) drop-shadow(0 10px 10px rgba(0,0,0,0.4));
-            z-index: 4; opacity: 0;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+            z-index: 6; opacity: 0; pointer-events: none; transform-origin: bottom center;
         }
 
         /* --- 操作パネル --- */
         #control-panel { height: 35%; background: var(--jiro-yellow); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
-        .control-col { background: var(--jiro-black); display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; }
-        .col-header { text-align: center; background: #333; color: white; padding: 5px 0; font-size: 0.9rem; font-weight: 700; }
-        .btn-zone { flex: 1; display: flex; justify-content: center; align-items: center; color: #555; font-size: 1.3rem; font-weight: 900; cursor: pointer; border-bottom: 1px solid #222; }
-        .btn-zone.active { background: var(--jiro-yellow); color: var(--jiro-black); }
+        .control-col { background: var(--jiro-black); display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; touch-action: none; }
+        .col-header { 
+            text-align: center; background: var(--jiro-red); color: white; padding: 5px 0; 
+            font-family: 'Dela Gothic One', cursive; font-size: 1.1rem; pointer-events: none; border-bottom: 2px solid #a00;
+        }
+        .btn-zone { 
+            flex: 1; display: flex; justify-content: center; align-items: center; 
+            color: #777; font-size: 1.4rem; border-bottom: 1px solid #333; cursor: pointer; transition: 0.1s;
+        }
+        .btn-zone.active { background: var(--jiro-yellow); color: var(--jiro-black); font-family: 'Dela Gothic One', cursive; font-size: 1.6rem; }
 
     </style>
 </head>
@@ -131,34 +193,45 @@
 
 <div id="start-screen">
     <div class="title-logo">ニンニク<br>入れますか？</div>
-    <button class="action-btn" id="start-btn">営業開始</button>
+    <div class="btn-container">
+        <button class="action-btn" onclick="startGame('sp')">
+            スマホで遊ぶ<br><span class="btn-subtext">（フリック＆タップ対応）</span>
+        </button>
+        <button class="action-btn pc-btn" onclick="startGame('pc')">
+            PCで遊ぶ<br><span class="btn-subtext">（クリック専用）</span>
+        </button>
+    </div>
 </div>
 
 <div id="result-screen">
-    <div class="title-logo" style="color:var(--jiro-yellow);">営業終了</div>
+    <div class="title-logo" style="color:var(--jiro-yellow); text-shadow:none;">営業終了</div>
     <div style="font-size:1.5rem; text-align:center;">本日のお客さま</div>
-    <div style="font-size:5rem; font-weight:900; color:var(--jiro-yellow);" id="final-score">0</div>
-    <button class="action-btn" id="retry-btn">もう一度</button>
+    <div style="font-family: 'Dela Gothic One', cursive; font-size:5rem; color:var(--jiro-yellow); text-shadow: 3px 3px 0 #000;"><span id="final-score">0</span> <span style="font-size:3rem;">杯</span></div>
+    <button class="action-btn" onclick="retryGame()" style="margin-top: 20px;">もう一度</button>
 </div>
+
+<div id="miss-indicator">Miss! -5秒</div>
 
 <div id="game-container" style="display:none;">
     <div id="hud">
-        <div id="timer-box">時間: <span id="time">90</span></div>
+        <div id="timer-box">残時間: <span id="time">90</span></div>
         <div>捌いた数: <span id="score">0</span></div>
     </div>
     <div id="customer-zone">
         <div id="speech-bubble"><div id="speech-text"></div></div>
     </div>
+    
     <div id="kitchen-view">
-        <div id="bowl-container">
-            <div id="bowl-side"></div>
-            <div id="bowl-rim"></div>
-            <div id="bowl-inside"><div id="karame-layer"></div></div>
+        <div id="ramen-presentation">
+            <img src="./丼ぶり_イメージ図.png" id="bowl-image" alt="丼">
+            <div id="karame-layer"></div>
+            <div id="buta-layer"></div>
             <div id="yasai-layer"></div>
             <div id="ninniku-layer"></div>
             <div id="abura-layer"></div>
         </div>
     </div>
+
     <div id="control-panel">
         <div class="control-col" data-type="ninniku">
             <div class="col-header">ニンニク</div>
@@ -166,7 +239,7 @@
         </div>
         <div class="control-col" data-type="yasai">
             <div class="col-header">ヤサイ</div>
-            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">少なめ</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">少な</div>
         </div>
         <div class="control-col" data-type="abura">
             <div class="col-header">アブラ</div>
@@ -180,28 +253,47 @@
 </div>
 
 <script>
-    // キャラクターレパートリー（「普通」という表現を排除し、プレイヤーに察しさせる）
-    const orderDataList = [
-        { char: "初心者", phrases: [{ text: "えっと、ヤサイマシで、", req: { y: 2 } }, { text: "ニンニク抜き…", req: { n: 0 } }, { text: "以上です！", req: { fill: true } }] },
+    // --- 一般客（多め） ---
+    const normalOrders = [
+        { char: "会社員", phrases: [{ text: "ニンニクヤサイで。", req: { n:2, y:2 } }, { text: "以上です。", req: { fill: true } }] },
+        { char: "学生", phrases: [{ text: "ヤサイマシマシ！", req: { y:2 } }, { text: "アブラカラメ！", req: { a:2, k:2 } }, { text: "以上！", req: { fill: true } }] },
+        { char: "常連客A", phrases: [{ text: "ヤサイ……", req: { y: 2 } }, { text: "アブラ。", req: { a: 2 } }, { text: "（ジッと見つめてくる）", req: { fill: true } }] },
+        { char: "常連客B", phrases: [{ text: "ニンニクカラメ。", req: { n: 2, k: 2 } }, { text: "（無言で待っている）", req: { fill: true } }] },
+        { char: "サラリーマン", phrases: [{ text: "明日は会議なんで、ニンニク抜きで。", req: { n: 0 } }, { text: "以上でお願いします。", req: { fill: true } }] },
+        { char: "若手社員", phrases: [{ text: "アブラ抜きで！", req: { a: 0 } }, { text: "カラメでお願いします！", req: { k: 2 } }, { text: "以上ッス！", req: { fill: true } }] },
+        { char: "カップル（男）", phrases: [{ text: "彼女の前だから匂うのはちょっと…", req: { n: 0 } }, { text: "でもガッツリ食いたいんで野菜は山盛りで！", req: { y: 2 } }, { text: "これで！", req: { fill: true } }] },
+        { char: "ベテラン", phrases: [{ text: "アブラマシマシ、", req: { a: 2 } }, { text: "カラメ。", req: { k: 2 } }, { text: "……", req: { fill: true } }] },
+        { char: "一般客", phrases: [{ text: "そのままお願いします。", req: { fill: true } }] },
+        { char: "一般客", phrases: [{ text: "ヤサイ少なめ、ニンニクで。", req: { y: 0, n: 2 } }, { text: "以上です。", req: { fill: true } }] },
+        { char: "一般客", phrases: [{ text: "カラメのみで。", req: { k: 2 } }, { text: "あとは普通で！", req: { fill: true } }] },
+        { char: "一般客", phrases: [{ text: "ニンニク抜き、アブラ抜きで。", req: { n: 0, a: 0 } }, { text: "お願いします！", req: { fill: true } }] },
+        { char: "一般客", phrases: [{ text: "ニンニクアブラで！", req: { n: 2, a: 2 } }, { text: "以上です！", req: { fill: true } }] },
+        { char: "一般客", phrases: [{ text: "ヤサイカラメ！", req: { y: 2, k: 2 } }, { text: "以上っす！", req: { fill: true } }] }
+    ];
+
+    // --- コンセプトキャラ ---
+    const specialOrders = [
         { char: "無口な男", phrases: [{ text: "……", req: {} }, { text: "……", req: {} }, { text: "（コクリと頷く）", req: { fill: true } }] },
         { char: "限界学生", phrases: [{ text: "全マシ！！", req: { n:2,y:2,a:2,k:2 } }] },
         { char: "お嬢様", phrases: [{ text: "お野菜を控えめに…", req: { y: 0 } }, { text: "油も、お味も控えめでよろしいわ。", req: { a:0, k:0 } }, { text: "よろしくて？", req: { fill: true } }] },
         { char: "泥酔客", phrases: [{ text: "カラメッ！味を濃くっ！", req: { k: 2 } }, { text: "野菜はいらねえ…", req: { y: 0 } }, { text: "……寝るわ。", req: { fill: true } }] },
         { char: "伝説の漢", phrases: [{ text: "ニンニクマシマシ…", req: { n: 2 } }, { text: "アブラマシマシ…", req: { a: 2 } }, { text: "ヤサイ……マシだッ！", req: { y: 2 } }, { text: "押忍！", req: { fill: true } }] },
-        { char: "アスリート", phrases: [{ text: "野菜を山盛りに。", req: { y: 2 } }, { text: "脂は徹底排除！", req: { a: 0 } }, { text: "以上だ。", req: { fill: true } }] },
-        { char: "サラリーマン", phrases: [{ text: "明日は会議なんで、ニンニク抜きで。", req: { n: 0 } }, { text: "以上でお願いします。", req: { fill: true } }] },
-        { char: "若手社員", phrases: [{ text: "アブラ抜きで！", req: { a: 0 } }, { text: "カラメでお願いします！", req: { k: 2 } }, { text: "以上ッス！", req: { fill: true } }] },
-        { char: "常連客A", phrases: [{ text: "ヤサイ……", req: { y: 2 } }, { text: "アブラ。", req: { a: 2 } }, { text: "（ジッと見つめてくる）", req: { fill: true } }] },
-        { char: "常連客B", phrases: [{ text: "ニンニクカラメ。", req: { n: 2, k: 2 } }, { text: "（無言で待っている）", req: { fill: true } }] },
-        { char: "カップル（男）", phrases: [{ text: "彼女の前だから匂うのはちょっと…", req: { n: 0 } }, { text: "でもガッツリ食いたいんで野菜は山盛りで！", req: { y: 2 } }, { text: "これで！", req: { fill: true } }] },
-        { char: "ベテラン", phrases: [{ text: "アブラマシマシ、", req: { a: 2 } }, { text: "カラメ。", req: { k: 2 } }, { text: "……", req: { fill: true } }] }
+        { char: "アスリート", phrases: [{ text: "野菜を山盛りに。", req: { y: 2 } }, { text: "脂は徹底排除！", req: { a: 0 } }, { text: "以上だ。", req: { fill: true } }] }
     ];
 
     let score = 0, timeLeft = 90, timerInterval = null, isPlaying = false;
     let currentCustomer = null, currentPhraseIndex = 0, currentStatus = { n:null, y:null, a:null, k:null };
     let isTyping = false, currentTextStr = "";
+    let lastWasSpecial = false; 
+    let currentInputMode = 'sp'; 
 
-    function startGame() {
+    function startGame(mode) {
+        if(mode) currentInputMode = mode; 
+        
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'flex';
+        
         isPlaying = true;
         score = 0; 
         timeLeft = 90;
@@ -215,6 +307,10 @@
             updateTimeDisplay();
             if(timeLeft <= 0) endGame();
         }, 1000);
+    }
+
+    function retryGame() {
+        startGame(currentInputMode);
     }
 
     function endGame() {
@@ -233,8 +329,17 @@
     function startCustomer() {
         currentStatus = { n:null, y:null, a:null, k:null };
         document.querySelectorAll('.btn-zone').forEach(b => b.classList.remove('active'));
-        updateBowl(null, null, null, true);
-        currentCustomer = orderDataList[Math.floor(Math.random() * orderDataList.length)];
+        updateBowl(null, null, null, true); // どんぶりをリセット
+        
+        let pool = normalOrders;
+        if (!lastWasSpecial && Math.random() < 0.4) {
+            pool = specialOrders;
+            lastWasSpecial = true;
+        } else {
+            lastWasSpecial = false;
+        }
+
+        currentCustomer = pool[Math.floor(Math.random() * pool.length)];
         currentPhraseIndex = 0;
         currentTextStr = `【${currentCustomer.char}】\n`;
         showPhrase();
@@ -262,15 +367,14 @@
         const old = currentStatus[key];
         currentStatus[key] = val;
 
-        // UI更新
         document.querySelectorAll(`.control-col[data-type="${type}"] .btn-zone`).forEach(b => {
             b.classList.toggle('active', parseInt(b.dataset.val) === val);
         });
 
-        // ペナルティ判定（間違えたら即座に減点）
         const phrase = currentCustomer.phrases[currentPhraseIndex];
         const target = phrase.req.fill ? 1 : phrase.req[key];
 
+        // ミス判定とペナルティ
         if(target !== undefined && val !== target) {
             applyPenalty(); 
         }
@@ -279,14 +383,19 @@
         checkMatch();
     }
 
-    // シビアになったペナルティ処理
     function applyPenalty() {
         timeLeft -= 5;
         updateTimeDisplay();
-        const t = document.getElementById('timer-box');
+        
+        const t = document.getElementById('hud');
         t.classList.remove('timer-flash'); 
         void t.offsetWidth; 
         t.classList.add('timer-flash');
+
+        const missEl = document.getElementById('miss-indicator');
+        missEl.classList.remove('show-miss');
+        void missEl.offsetWidth; 
+        missEl.classList.add('show-miss');
         
         if(timeLeft <= 0) endGame();
     }
@@ -312,27 +421,31 @@
             if(currentPhraseIndex < currentCustomer.phrases.length) {
                 setTimeout(showPhrase, 200);
             } else { 
-                score++; 
-                document.getElementById('score').innerText = score; 
-                currentCustomer = null; 
-                setTimeout(startCustomer, 500); 
+                setTimeout(() => {
+                    document.getElementById('speech-text').innerHTML = currentTextStr + '<br><span class="itadakimasu">いただきます！</span>';
+                    score++; 
+                    document.getElementById('score').innerText = score; 
+                    currentCustomer = null; 
+                    setTimeout(startCustomer, 800); 
+                }, 200);
             }
         }
     }
 
     function wasRequestedBefore(k) {
-        for(let i=0; i<=currentPhraseIndex; i++) {
+        for(let i=0; i < currentPhraseIndex; i++) {
             if(currentCustomer.phrases[i].req[k] !== undefined) return true;
         }
         return false;
     }
 
+    // --- 丼のビジュアル更新ロジック（アブラの高さ連動） ---
     function updateBowl(key, old, val, reset=false) {
         if(reset) {
             ['yasai','ninniku','abura'].forEach(id => { 
                 const e = document.getElementById(id+'-layer'); 
                 e.style.opacity = 0; 
-                e.style.transform = 'scale(0)'; 
+                e.style.transform = (id === 'ninniku') ? 'translateX(60px) scale(0)' : 'translateX(-50%) scale(0)'; 
             });
             document.getElementById('karame-layer').style.backgroundColor = 'transparent';
             return;
@@ -341,43 +454,88 @@
         const isUp = (val > (old || 0));
         const e = document.getElementById(({n:'ninniku', y:'yasai', a:'abura', k:'karame'}[key]) + '-layer');
         
+        // カラメの処理
         if(key === 'k') {
             e.style.backgroundColor = val === 2 ? 'rgba(0,0,0,0.6)' : (val === 0 ? 'rgba(255,255,255,0.1)' : 'transparent');
-        } else {
-            const sc = key === 'y' ? (val === 0 ? 0.6 : (val === 2 ? 1.3 : 1)) : (val === 2 ? 1.5 : 1);
-            const op = val === 0 ? 0 : (key === 'a' && val === 1 ? 0.5 : 1);
-            const baseTrans = key === 'n' ? '' : 'translateX(-50%) ';
+            return;
+        } 
+
+        // スケールと不透明度の決定
+        const sc = key === 'y' ? (val === 0 ? 0.6 : (val === 2 ? 1.3 : 1)) : (val === 2 ? 1.4 : 1);
+        const op = val === 0 ? 0 : (key === 'a' && val === 1 ? 0.7 : 1);
+        const baseTrans = key === 'n' ? 'translateX(60px) ' : 'translateX(-50%) ';
+        
+        // アブラの連動高さ計算（ヤサイの量に合わせて位置を上下させる）
+        if (key === 'a' || key === 'y') {
+            const aLayer = document.getElementById('abura-layer');
+            const currentYLevel = currentStatus.y === null ? 1 : currentStatus.y; // ヤサイの現在の量
+            const currentALevel = currentStatus.a === null ? 0 : currentStatus.a; // アブラの現在の量
             
-            if(isUp) {
-                e.getAnimations().forEach(a => a.cancel());
-                e.animate([
-                    { transform: baseTrans + 'translateY(-50px) scale(' + sc + ')', opacity: 0 }, 
-                    { transform: baseTrans + 'scale(' + sc + ')', opacity: op }
-                ], { duration: 200 });
+            // ヤサイの量に応じた基準の高さ (bottom値)
+            let aburaBottom = 110; // 0: 少なめ
+            if (currentYLevel === 1) aburaBottom = 170; // 1: 普通
+            if (currentYLevel === 2) aburaBottom = 240; // 2: マシマシ
+            
+            // アブラレイヤーに高さを適用
+            aLayer.style.bottom = aburaBottom + 'px';
+            
+            // ヤサイを更新した時に、すでにアブラが出ている場合はアブラのスケールも維持しつつ位置移動
+            if (key === 'y' && currentALevel > 0) {
+                 const aSc = currentALevel === 2 ? 1.4 : 1;
+                 aLayer.style.transform = `translateX(-50%) scale(${aSc})`;
             }
-            e.style.transform = baseTrans + `scale(${sc})`;
-            e.style.opacity = op;
         }
+
+        // アニメーション実行
+        if(isUp) {
+            e.getAnimations().forEach(a => a.cancel());
+            e.animate([
+                { transform: baseTrans + 'translateY(-50px) scale(' + sc + ')', opacity: 0 }, 
+                { transform: baseTrans + 'scale(' + sc + ')', opacity: op }
+            ], { duration: 200, easing: 'ease-out' });
+        }
+        e.style.transform = baseTrans + `scale(${sc})`;
+        e.style.opacity = op;
     }
 
-    document.querySelectorAll('.btn-zone').forEach(b => {
-        b.addEventListener('pointerdown', (e) => { 
-            e.preventDefault(); 
-            setVal(b.parentElement.dataset.type, parseInt(b.dataset.val)); 
+    // --- 独立した操作制御 ---
+    
+    // PC（クリック専用）
+    document.querySelectorAll('.btn-zone').forEach(btn => {
+        btn.addEventListener('mousedown', (e) => {
+            if (currentInputMode !== 'pc' || !isPlaying || !currentCustomer) return;
+            setVal(btn.parentElement.dataset.type, parseInt(btn.dataset.val));
         });
     });
 
-    document.getElementById('start-btn').onclick = () => { 
-        document.getElementById('start-screen').style.display = 'none'; 
-        document.getElementById('game-container').style.display = 'flex'; 
-        startGame(); 
-    };
+    // スマホ（フリック＆タップ）
+    document.querySelectorAll('.control-col').forEach(col => {
+        let startY = 0;
+        
+        col.addEventListener('touchstart', (e) => {
+            if (currentInputMode !== 'sp' || !isPlaying) return;
+            startY = e.touches[0].clientY;
+        }, {passive: true});
 
-    document.getElementById('retry-btn').onclick = () => { 
-        document.getElementById('result-screen').style.display = 'none'; 
-        document.getElementById('game-container').style.display = 'flex'; 
-        startGame(); 
-    };
+        col.addEventListener('touchend', (e) => {
+            if (currentInputMode !== 'sp' || !isPlaying || !currentCustomer) return;
+            let endY = e.changedTouches[0].clientY;
+            let diffY = startY - endY;
+            let type = col.dataset.type;
+
+            if (diffY > 30) {
+                setVal(type, 2); 
+            } else if (diffY < -30) {
+                setVal(type, 0); 
+            } else {
+                let target = e.target.closest('.btn-zone');
+                if (target) {
+                    setVal(type, parseInt(target.dataset.val));
+                }
+            }
+        });
+    });
+
 </script>
 </body>
 </html>
