@@ -54,7 +54,7 @@
         .btn-subtext { font-family: 'Reggae One', sans-serif; font-size: 0.9rem; color: #ffcccc; text-shadow: none; }
         .pc-btn .btn-subtext { color: #aaa; }
 
-        /* --- HUD (タイマー・スコア) --- */
+        /* --- HUD --- */
         #hud {
             display: flex; justify-content: space-between; padding: 10px 20px;
             background: var(--jiro-red); border-bottom: 6px solid var(--jiro-yellow);
@@ -64,7 +64,7 @@
         .timer-flash { animation: flash-red 0.3s; }
         @keyframes flash-red { 0% { color: #fff; transform: scale(1); } 50% { color: #ffeb3b; transform: scale(1.3); } 100% { color: #fff; transform: scale(1); } }
 
-        /* --- ミス通知（ポップアップ） --- */
+        /* --- ミス通知 --- */
         #miss-indicator {
             position: absolute; top: 70px; left: 20px;
             color: #ff3333; font-family: 'Dela Gothic One', cursive; font-size: 2.5rem;
@@ -80,61 +80,57 @@
 
         /* --- 客のセリフエリア --- */
         #customer-zone { 
-            height: 20%; display: flex; align-items: center; justify-content: center; padding: 10px; 
+            height: 22%; display: flex; align-items: center; justify-content: center; padding: 10px; 
             background: repeating-linear-gradient(45deg, #a00 0, #a00 10px, #800 10px, #800 20px);
             border-bottom: 5px solid var(--jiro-yellow);
         }
         #speech-bubble {
             background: rgba(255, 255, 255, 0.95); color: #000; padding: 15px; border-radius: 5px;
             width: 100%; max-width: 600px; border: 4px solid var(--jiro-black);
-            position: relative; min-height: 90px; font-size: 1.1rem; line-height: 1.5; font-weight:bold;
+            position: relative; min-height: 110px; font-size: 1.1rem; line-height: 1.5; font-weight:bold;
             box-shadow: 5px 5px 0 var(--jiro-black);
             display: flex; align-items: center;
         }
         .itadakimasu { color: var(--jiro-red); font-family: 'Dela Gothic One', cursive; font-size: 1.5rem; animation: pop 0.3s ease-out; display: inline-block; }
         @keyframes pop { 0% { transform: scale(0.5); opacity: 0;} 100% { transform: scale(1); opacity: 1;} }
 
-        /* --- 厨房・カウンター --- */
+        /* --- 厨房 --- */
         #kitchen-view {
-            flex: 1; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px;
+            flex: 1; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px;
             background: 
                 linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
                 repeating-linear-gradient(90deg, var(--wood-light) 0px, var(--wood-light) 40px, var(--wood-dark) 41px, var(--wood-dark) 80px);
             position: relative; box-shadow: inset 0 20px 50px rgba(0,0,0,0.8);
         }
 
-        /* --- ラーメン表示コンテナ --- */
+        /* --- ラーメン表示 --- */
         #ramen-presentation {
             position: relative; width: 340px; height: 320px;
             display: flex; justify-content: center; align-items: flex-end;
             filter: drop-shadow(0 15px 20px rgba(0,0,0,0.8));
         }
 
-        /* ユーザー提供の丼画像 */
         #bowl-image {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 320px; height: auto; z-index: 1; pointer-events: none;
+            width: 340px; height: auto; z-index: 1; pointer-events: none;
         }
 
-        /* カラメ（汁）を丼の形に合わせた楕円形に。初期は非表示（透明） */
         #karame-layer { 
-            position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
-            width: 250px; height: 60px; border-radius: 50%; /* 楕円形 */
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 280px; height: 100px; border-radius: 50%;
             background-color: transparent; transition: 0.3s; z-index: 2; pointer-events: none;
         }
 
-        /* チャーシュー（肉）- 丼の中に入るように位置を上に調整 */
         #buta-layer {
-            position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
-            width: 240px; height: 50px;
+            position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
+            width: 260px; height: 60px;
             background: radial-gradient(ellipse at center, #9e5b40 0%, #63331b 100%);
             border-radius: 40px; z-index: 3; opacity: 1;
         }
 
-        /* ヤサイ - 位置を上に調整 */
         #yasai-layer {
-            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%) scale(0);
-            width: 220px; height: 180px;
+            position: absolute; bottom: 75px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 240px; height: 200px;
             border-radius: 50% 50% 20% 20% / 70% 70% 30% 30%;
             background-color: #f2ebd9; 
             background-image: 
@@ -148,10 +144,9 @@
             z-index: 4; opacity: 0; transform-origin: bottom center;
         }
 
-        /* ニンニク - 右下の丼の中に収まるように調整 */
         #ninniku-layer {
-            position: absolute; bottom: 90px; left: 50%; transform: translateX(45px) scale(0);
-            width: 75px; height: 50px; border-radius: 40% 60% 50% 50%;
+            position: absolute; bottom: 65px; left: 50%; transform: translateX(60px) scale(0);
+            width: 80px; height: 55px; border-radius: 40% 60% 50% 50%;
             background-color: #ffe87c;
             background-image: radial-gradient(circle at 3px 3px, #ccaa22 1px, transparent 1px);
             background-size: 8px 8px;
@@ -159,45 +154,27 @@
             z-index: 5; opacity: 0; transform-origin: bottom center;
         }
 
-        /* アブラ - 初期位置を高めに設定 */
         #abura-layer {
-            position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%) scale(0);
-            width: 120px; height: 70px;
+            position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 130px; height: 80px;
             background: radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,245,215,0.8) 50%, transparent 70%);
             border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; 
             filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
             z-index: 6; opacity: 0; pointer-events: none; transform-origin: bottom center;
         }
 
-        /* --- 操作パネル（スマホのフリックUI風に2x2グリッド化） --- */
-        #control-panel { 
-            height: 38%; background: var(--jiro-black); 
-            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; 
-            gap: 10px; padding: 10px; border-top: 2px solid var(--jiro-red);
+        /* --- 操作パネル --- */
+        #control-panel { height: 35%; background: var(--jiro-yellow); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
+        .control-col { background: var(--jiro-black); display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; touch-action: none; }
+        .col-header { 
+            text-align: center; background: var(--jiro-red); color: white; padding: 5px 0; 
+            font-family: 'Dela Gothic One', cursive; font-size: 1.1rem; pointer-events: none; border-bottom: 2px solid #a00;
         }
-        
-        .control-col { 
-            background: #2a2a2a; border: 3px solid var(--jiro-red); border-radius: 12px;
-            position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            touch-action: none; cursor: pointer; transition: background 0.1s;
+        .btn-zone { 
+            flex: 1; display: flex; justify-content: center; align-items: center; 
+            color: #777; font-size: 1.4rem; border-bottom: 1px solid #333; cursor: pointer; transition: 0.1s;
         }
-
-        /* フリック用テキストの配置 */
-        .flick-label-top, .flick-label-bottom {
-            position: absolute; font-size: 1.1rem; color: #777; font-weight: bold;
-            transition: 0.2s;
-        }
-        .flick-label-top { top: 10px; }
-        .flick-label-bottom { bottom: 10px; }
-        .flick-label-center {
-            font-size: 2.2rem; font-family: 'Dela Gothic One', cursive; color: white;
-            transition: 0.2s;
-        }
-
-        /* --- 選択状態のスタイル（data-valで色を変える） --- */
-        .control-col[data-val="2"] .flick-label-top { color: var(--jiro-yellow); text-shadow: 1px 1px 0 #000; transform: scale(1.2); }
-        .control-col[data-val="1"] .flick-label-center { color: var(--jiro-yellow); text-shadow: 1px 1px 0 #000; transform: scale(1.1); }
-        .control-col[data-val="0"] .flick-label-bottom { color: var(--jiro-yellow); text-shadow: 1px 1px 0 #000; transform: scale(1.2); }
+        .btn-zone.active { background: var(--jiro-yellow); color: var(--jiro-black); font-family: 'Dela Gothic One', cursive; font-size: 1.6rem; }
 
     </style>
 </head>
@@ -207,10 +184,10 @@
     <div class="title-logo">ニンニク<br>入れますか？</div>
     <div class="btn-container">
         <button class="action-btn" onclick="startGame('sp')">
-            スマホで遊ぶ<br><span class="btn-subtext">（フリック入力）</span>
+            スマホで遊ぶ<br><span class="btn-subtext">（フリック＆タップ対応）</span>
         </button>
         <button class="action-btn pc-btn" onclick="startGame('pc')">
-            PCで遊ぶ<br><span class="btn-subtext">（マウスクリック＆ドラッグ）</span>
+            PCで遊ぶ<br><span class="btn-subtext">（クリック専用）</span>
         </button>
     </div>
 </div>
@@ -235,7 +212,7 @@
     
     <div id="kitchen-view">
         <div id="ramen-presentation">
-            <img src="./bowl.png" id="bowl-image" alt="丼" onerror="this.style.display='none'">
+            <img src="./丼ぶり_イメージ図.png" id="bowl-image" alt="丼" onerror="this.style.display='none'">
             <div id="karame-layer"></div>
             <div id="buta-layer"></div>
             <div id="yasai-layer"></div>
@@ -246,30 +223,26 @@
 
     <div id="control-panel">
         <div class="control-col" data-type="ninniku">
-            <div class="flick-label-top">マシ</div>
-            <div class="flick-label-center">ニンニク</div>
-            <div class="flick-label-bottom">抜き</div>
+            <div class="col-header">ニンニク</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">抜き</div>
         </div>
         <div class="control-col" data-type="yasai">
-            <div class="flick-label-top">マシ</div>
-            <div class="flick-label-center">ヤサイ</div>
-            <div class="flick-label-bottom">少なめ</div>
+            <div class="col-header">ヤサイ</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">少な</div>
         </div>
         <div class="control-col" data-type="abura">
-            <div class="flick-label-top">マシ</div>
-            <div class="flick-label-center">アブラ</div>
-            <div class="flick-label-bottom">抜き</div>
+            <div class="col-header">アブラ</div>
+            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">抜き</div>
         </div>
         <div class="control-col" data-type="karame">
-            <div class="flick-label-top">カラメ</div>
-            <div class="flick-label-center">カラメ(味)</div>
-            <div class="flick-label-bottom">薄め</div>
+            <div class="col-header">カラメ</div>
+            <div class="btn-zone" data-val="2">カラメ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">薄め</div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- 客のデータ（省略せず記載） ---
+    // --- 客のデータ ---
     const normalOrders = [
         { char: "会社員", phrases: [{ text: "ニンニクヤサイで。", req: { n:2, y:2 } }, { text: "以上です。", req: { fill: true } }] },
         { char: "学生", phrases: [{ text: "ヤサイマシマシ！", req: { y:2 } }, { text: "アブラカラメ！", req: { a:2, k:2 } }, { text: "以上！", req: { fill: true } }] },
@@ -338,8 +311,9 @@
 
     function startCustomer() {
         currentStatus = { n:null, y:null, a:null, k:null };
-        document.querySelectorAll('.control-col').forEach(c => delete c.dataset.val); // UIの選択状態をリセット
-        updateBowl(null, null, null, true); // どんぶりをリセット
+        document.querySelectorAll('.control-col').forEach(c => delete c.dataset.val);
+        document.querySelectorAll('.btn-zone').forEach(b => b.classList.remove('active'));
+        updateBowl(null, null, null, true); 
         
         let pool = normalOrders;
         if (!lastWasSpecial && Math.random() < 0.4) {
@@ -378,14 +352,13 @@
         const old = currentStatus[key];
         currentStatus[key] = val;
 
-        // UI（パネル）のデータ属性を更新してCSSで色を変える
-        const col = document.querySelector(`.control-col[data-type="${type}"]`);
-        col.dataset.val = val;
+        document.querySelectorAll(`.control-col[data-type="${type}"] .btn-zone`).forEach(b => {
+            b.classList.toggle('active', parseInt(b.dataset.val) === val);
+        });
 
         const phrase = currentCustomer.phrases[currentPhraseIndex];
         const target = phrase.req.fill ? 1 : phrase.req[key];
 
-        // ミス判定とペナルティ
         if(target !== undefined && val !== target) {
             applyPenalty(); 
         }
@@ -456,7 +429,7 @@
             ['yasai','ninniku','abura'].forEach(id => { 
                 const e = document.getElementById(id+'-layer'); 
                 e.style.opacity = 0; 
-                e.style.transform = (id === 'ninniku') ? 'translateX(45px) scale(0)' : 'translateX(-50%) scale(0)'; 
+                e.style.transform = (id === 'ninniku') ? 'translateX(60px) scale(0)' : 'translateX(-50%) scale(0)'; 
             });
             document.getElementById('karame-layer').style.backgroundColor = 'transparent';
             return;
@@ -465,32 +438,28 @@
         const isUp = (val > (old || 0));
         const e = document.getElementById(({n:'ninniku', y:'yasai', a:'abura', k:'karame'}[key]) + '-layer');
         
-        // カラメ（汁）は選ばれた時にのみ表示
         if(key === 'k') {
             if (val === 2) {
-                e.style.backgroundColor = 'rgba(100, 40, 0, 0.7)'; // 濃い汁
+                e.style.backgroundColor = 'rgba(80, 20, 0, 0.7)'; 
             } else if (val === 1) {
-                e.style.backgroundColor = 'rgba(150, 80, 20, 0.5)'; // 普通の汁
+                e.style.backgroundColor = 'rgba(120, 50, 10, 0.5)'; 
             } else {
-                e.style.backgroundColor = 'transparent'; // 薄め・抜き
+                e.style.backgroundColor = 'transparent';
             }
             return;
         } 
 
-        // スケールと不透明度
         const sc = key === 'y' ? (val === 0 ? 0.6 : (val === 2 ? 1.3 : 1)) : (val === 2 ? 1.4 : 1);
         const op = val === 0 ? 0 : (key === 'a' && val === 1 ? 0.7 : 1);
-        const baseTrans = key === 'n' ? 'translateX(45px) ' : 'translateX(-50%) ';
+        const baseTrans = key === 'n' ? 'translateX(60px) ' : 'translateX(-50%) ';
         
-        // アブラの連動高さ計算（ヤサイの量に合わせて位置を上下させる）
         if (key === 'a' || key === 'y') {
             const aLayer = document.getElementById('abura-layer');
             const currentYLevel = currentStatus.y === null ? 1 : currentStatus.y;
             const currentALevel = currentStatus.a === null ? 0 : currentStatus.a;
             
-            // ヤサイの量に応じた基準の高さ
-            let aburaBottom = 130; 
-            if (currentYLevel === 1) aburaBottom = 190; 
+            let aburaBottom = 110; 
+            if (currentYLevel === 1) aburaBottom = 170; 
             if (currentYLevel === 2) aburaBottom = 240; 
             
             aLayer.style.bottom = aburaBottom + 'px';
@@ -501,7 +470,6 @@
             }
         }
 
-        // アニメーション実行
         if(isUp) {
             e.getAnimations().forEach(a => a.cancel());
             e.animate([
@@ -513,48 +481,53 @@
         e.style.opacity = op;
     }
 
-    // --- フリック操作パネルのロジック ---
+    // --- 完全分離された操作イベント ---
+    
+    // 【PCモード専用】 mousedown のみ反応（純粋なクリック）
+    document.querySelectorAll('.btn-zone').forEach(btn => {
+        btn.addEventListener('mousedown', (e) => {
+            if (currentInputMode !== 'pc' || !isPlaying || !currentCustomer) return;
+            e.preventDefault(); 
+            let type = btn.parentElement.dataset.type;
+            let val = parseInt(btn.dataset.val);
+            setVal(type, val);
+        });
+    });
+
+    // 【スマホモード専用】 touchstart/touchend のみ反応（フリック＆タップ）
     document.querySelectorAll('.control-col').forEach(col => {
         let startY = 0;
-        let isDragging = false;
+        let isMoved = false;
         
-        // --- PC (マウス) 用 ---
-        col.addEventListener('mousedown', (e) => {
-            if (currentInputMode !== 'pc' || !isPlaying) return;
-            startY = e.clientY;
-            isDragging = true;
-        });
-
-        // --- スマホ (タッチ) 用 ---
         col.addEventListener('touchstart', (e) => {
             if (currentInputMode !== 'sp' || !isPlaying) return;
             startY = e.touches[0].clientY;
+            isMoved = false;
         }, {passive: true});
 
-        // 共通のフリック判定処理
-        const handleFlick = (endY) => {
-            if (!isPlaying || !currentCustomer) return;
+        col.addEventListener('touchmove', (e) => {
+            if (currentInputMode !== 'sp' || !isPlaying) return;
+            isMoved = true;
+        }, {passive: true});
+
+        col.addEventListener('touchend', (e) => {
+            if (currentInputMode !== 'sp' || !isPlaying || !currentCustomer) return;
+            let endY = e.changedTouches[0].clientY;
             let diffY = startY - endY;
             let type = col.dataset.type;
 
-            if (diffY > 30) {
-                setVal(type, 2); // 上フリック（マシ）
-            } else if (diffY < -30) {
-                setVal(type, 0); // 下フリック（抜き/少なめ）
+            // 大きくスワイプした場合はフリック判定
+            if (isMoved && diffY > 30) {
+                setVal(type, 2); // 上フリック
+            } else if (isMoved && diffY < -30) {
+                setVal(type, 0); // 下フリック
             } else {
-                setVal(type, 1); // タップ（普通）
+                // スワイプ距離が短い、または動かしていない場合はタップした要素を判定
+                let target = e.target.closest('.btn-zone');
+                if (target) {
+                    setVal(type, parseInt(target.dataset.val));
+                }
             }
-        };
-
-        window.addEventListener('mouseup', (e) => {
-            if (currentInputMode !== 'pc' || !isDragging) return;
-            isDragging = false;
-            handleFlick(e.clientY);
-        });
-
-        col.addEventListener('touchend', (e) => {
-            if (currentInputMode !== 'sp' || !isPlaying) return;
-            handleFlick(e.changedTouches[0].clientY);
         });
     });
 
