@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ニンニク入れますか？ - 激闘の厨房</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Reggae+One&family=Yuji+Syuku&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Reggae+One&display=swap" rel="stylesheet">
     <style>
         :root {
             --jiro-yellow: #ffcc00;
@@ -78,24 +78,25 @@
             100% { opacity: 0; transform: translateY(-60px) scale(1) rotate(0deg); }
         }
 
-        /* --- 客のセリフエリア（赤暖簾風） --- */
+        /* --- 客のセリフエリア --- */
         #customer-zone { 
-            height: 22%; display: flex; align-items: center; justify-content: center; padding: 10px; 
+            height: 20%; display: flex; align-items: center; justify-content: center; padding: 10px; 
             background: repeating-linear-gradient(45deg, #a00 0, #a00 10px, #800 10px, #800 20px);
             border-bottom: 5px solid var(--jiro-yellow);
         }
         #speech-bubble {
             background: rgba(255, 255, 255, 0.95); color: #000; padding: 15px; border-radius: 5px;
             width: 100%; max-width: 600px; border: 4px solid var(--jiro-black);
-            position: relative; min-height: 110px; font-size: 1.1rem; line-height: 1.5; font-weight:bold;
+            position: relative; min-height: 90px; font-size: 1.1rem; line-height: 1.5; font-weight:bold;
             box-shadow: 5px 5px 0 var(--jiro-black);
+            display: flex; align-items: center;
         }
         .itadakimasu { color: var(--jiro-red); font-family: 'Dela Gothic One', cursive; font-size: 1.5rem; animation: pop 0.3s ease-out; display: inline-block; }
         @keyframes pop { 0% { transform: scale(0.5); opacity: 0;} 100% { transform: scale(1); opacity: 1;} }
 
-        /* --- 厨房・汚れた木目カウンター --- */
+        /* --- 厨房・カウンター --- */
         #kitchen-view {
-            flex: 1; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px;
+            flex: 1; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 10px;
             background: 
                 linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
                 repeating-linear-gradient(90deg, var(--wood-light) 0px, var(--wood-light) 40px, var(--wood-dark) 41px, var(--wood-dark) 80px);
@@ -112,48 +113,45 @@
         /* ユーザー提供の丼画像 */
         #bowl-image {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 340px; height: auto; z-index: 1;
-            pointer-events: none; /* タッチ干渉防止 */
+            width: 320px; height: auto; z-index: 1; pointer-events: none;
         }
 
-        /* カラメ（濃さ）を丼全体にかけるフィルタ */
+        /* カラメ（汁）を丼の形に合わせた楕円形に。初期は非表示（透明） */
         #karame-layer { 
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 280px; height: 100px; border-radius: 50%;
-            background-color: rgba(0,0,0,0); transition: 0.3s; z-index: 2; pointer-events: none;
-        }
-
-        /* チャーシュー（肉）- 丼の中・手前寄りに配置 */
-        #buta-layer {
             position: absolute; bottom: 65px; left: 50%; transform: translateX(-50%);
-            width: 260px; height: 60px;
-            background: radial-gradient(ellipse at center, #9e5b40 0%, #63331b 100%);
-            border-radius: 40px; z-index: 3; opacity: 1; /* デフォルトで表示 */
+            width: 250px; height: 60px; border-radius: 50%; /* 楕円形 */
+            background-color: transparent; transition: 0.3s; z-index: 2; pointer-events: none;
         }
 
-        /* ヤサイ（もやしの山）- 中央配置 */
+        /* チャーシュー（肉）- 丼の中に入るように位置を上に調整 */
+        #buta-layer {
+            position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
+            width: 240px; height: 50px;
+            background: radial-gradient(ellipse at center, #9e5b40 0%, #63331b 100%);
+            border-radius: 40px; z-index: 3; opacity: 1;
+        }
+
+        /* ヤサイ - 位置を上に調整 */
         #yasai-layer {
-            position: absolute; bottom: 75px; left: 50%; transform: translateX(-50%) scale(0);
-            width: 240px; height: 200px;
+            position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 220px; height: 180px;
             border-radius: 50% 50% 20% 20% / 70% 70% 30% 30%;
-            background-color: #f2ebd9; /* もやしベース */
+            background-color: #f2ebd9; 
             background-image: 
-                /* キャベツの緑色を点在させる */
                 radial-gradient(circle at 30% 20%, #8bc34a 0, #8bc34a 15px, transparent 16px),
                 radial-gradient(circle at 75% 40%, #8bc34a 0, #8bc34a 12px, transparent 13px),
                 radial-gradient(circle at 45% 70%, #8bc34a 0, #8bc34a 20px, transparent 21px),
                 radial-gradient(circle at 20% 60%, #8bc34a 0, #8bc34a 10px, transparent 11px),
-                /* もやしの筋を再現 */
                 repeating-linear-gradient(75deg, transparent, transparent 8px, rgba(255,255,255,0.9) 9px, rgba(255,255,255,0.9) 11px),
                 repeating-linear-gradient(-65deg, transparent, transparent 12px, rgba(255,255,255,0.7) 13px, rgba(255,255,255,0.7) 15px);
             box-shadow: inset -10px -15px 30px rgba(0,0,0,0.5), 0 10px 15px rgba(0,0,0,0.4);
             z-index: 4; opacity: 0; transform-origin: bottom center;
         }
 
-        /* ニンニク（右下・黄色い粒々） */
+        /* ニンニク - 右下の丼の中に収まるように調整 */
         #ninniku-layer {
-            position: absolute; bottom: 65px; left: 50%; transform: translateX(60px) scale(0);
-            width: 80px; height: 55px; border-radius: 40% 60% 50% 50%;
+            position: absolute; bottom: 90px; left: 50%; transform: translateX(45px) scale(0);
+            width: 75px; height: 50px; border-radius: 40% 60% 50% 50%;
             background-color: #ffe87c;
             background-image: radial-gradient(circle at 3px 3px, #ccaa22 1px, transparent 1px);
             background-size: 8px 8px;
@@ -161,31 +159,45 @@
             z-index: 5; opacity: 0; transform-origin: bottom center;
         }
 
-        /* アブラ（もやしの上・ドロッとした塊） */
+        /* アブラ - 初期位置を高めに設定 */
         #abura-layer {
-            position: absolute; 
-            /* 初期位置（JSでヤサイの量に合わせて動的にbottomを変更します） */
-            bottom: 150px; 
-            left: 50%; transform: translateX(-50%) scale(0);
-            width: 130px; height: 80px;
+            position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%) scale(0);
+            width: 120px; height: 70px;
             background: radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,245,215,0.8) 50%, transparent 70%);
             border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; 
             filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
             z-index: 6; opacity: 0; pointer-events: none; transform-origin: bottom center;
         }
 
-        /* --- 操作パネル --- */
-        #control-panel { height: 35%; background: var(--jiro-yellow); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; }
-        .control-col { background: var(--jiro-black); display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; touch-action: none; }
-        .col-header { 
-            text-align: center; background: var(--jiro-red); color: white; padding: 5px 0; 
-            font-family: 'Dela Gothic One', cursive; font-size: 1.1rem; pointer-events: none; border-bottom: 2px solid #a00;
+        /* --- 操作パネル（スマホのフリックUI風に2x2グリッド化） --- */
+        #control-panel { 
+            height: 38%; background: var(--jiro-black); 
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; 
+            gap: 10px; padding: 10px; border-top: 2px solid var(--jiro-red);
         }
-        .btn-zone { 
-            flex: 1; display: flex; justify-content: center; align-items: center; 
-            color: #777; font-size: 1.4rem; border-bottom: 1px solid #333; cursor: pointer; transition: 0.1s;
+        
+        .control-col { 
+            background: #2a2a2a; border: 3px solid var(--jiro-red); border-radius: 12px;
+            position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            touch-action: none; cursor: pointer; transition: background 0.1s;
         }
-        .btn-zone.active { background: var(--jiro-yellow); color: var(--jiro-black); font-family: 'Dela Gothic One', cursive; font-size: 1.6rem; }
+
+        /* フリック用テキストの配置 */
+        .flick-label-top, .flick-label-bottom {
+            position: absolute; font-size: 1.1rem; color: #777; font-weight: bold;
+            transition: 0.2s;
+        }
+        .flick-label-top { top: 10px; }
+        .flick-label-bottom { bottom: 10px; }
+        .flick-label-center {
+            font-size: 2.2rem; font-family: 'Dela Gothic One', cursive; color: white;
+            transition: 0.2s;
+        }
+
+        /* --- 選択状態のスタイル（data-valで色を変える） --- */
+        .control-col[data-val="2"] .flick-label-top { color: var(--jiro-yellow); text-shadow: 1px 1px 0 #000; transform: scale(1.2); }
+        .control-col[data-val="1"] .flick-label-center { color: var(--jiro-yellow); text-shadow: 1px 1px 0 #000; transform: scale(1.1); }
+        .control-col[data-val="0"] .flick-label-bottom { color: var(--jiro-yellow); text-shadow: 1px 1px 0 #000; transform: scale(1.2); }
 
     </style>
 </head>
@@ -195,10 +207,10 @@
     <div class="title-logo">ニンニク<br>入れますか？</div>
     <div class="btn-container">
         <button class="action-btn" onclick="startGame('sp')">
-            スマホで遊ぶ<br><span class="btn-subtext">（フリック＆タップ対応）</span>
+            スマホで遊ぶ<br><span class="btn-subtext">（フリック入力）</span>
         </button>
         <button class="action-btn pc-btn" onclick="startGame('pc')">
-            PCで遊ぶ<br><span class="btn-subtext">（クリック専用）</span>
+            PCで遊ぶ<br><span class="btn-subtext">（マウスクリック＆ドラッグ）</span>
         </button>
     </div>
 </div>
@@ -223,7 +235,7 @@
     
     <div id="kitchen-view">
         <div id="ramen-presentation">
-            <img src="./bowl.png" id="bowl-image" alt="丼">
+            <img src="./丼ぶり_イメージ図.png" id="bowl-image" alt="丼" onerror="this.style.display='none'">
             <div id="karame-layer"></div>
             <div id="buta-layer"></div>
             <div id="yasai-layer"></div>
@@ -234,26 +246,30 @@
 
     <div id="control-panel">
         <div class="control-col" data-type="ninniku">
-            <div class="col-header">ニンニク</div>
-            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">抜き</div>
+            <div class="flick-label-top">マシ</div>
+            <div class="flick-label-center">ニンニク</div>
+            <div class="flick-label-bottom">抜き</div>
         </div>
         <div class="control-col" data-type="yasai">
-            <div class="col-header">ヤサイ</div>
-            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">少な</div>
+            <div class="flick-label-top">マシ</div>
+            <div class="flick-label-center">ヤサイ</div>
+            <div class="flick-label-bottom">少なめ</div>
         </div>
         <div class="control-col" data-type="abura">
-            <div class="col-header">アブラ</div>
-            <div class="btn-zone" data-val="2">マシ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">抜き</div>
+            <div class="flick-label-top">マシ</div>
+            <div class="flick-label-center">アブラ</div>
+            <div class="flick-label-bottom">抜き</div>
         </div>
         <div class="control-col" data-type="karame">
-            <div class="col-header">カラメ</div>
-            <div class="btn-zone" data-val="2">カラメ</div><div class="btn-zone" data-val="1">普通</div><div class="btn-zone" data-val="0">薄め</div>
+            <div class="flick-label-top">カラメ</div>
+            <div class="flick-label-center">カラメ(味)</div>
+            <div class="flick-label-bottom">薄め</div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- 一般客（多め） ---
+    // --- 客のデータ（省略せず記載） ---
     const normalOrders = [
         { char: "会社員", phrases: [{ text: "ニンニクヤサイで。", req: { n:2, y:2 } }, { text: "以上です。", req: { fill: true } }] },
         { char: "学生", phrases: [{ text: "ヤサイマシマシ！", req: { y:2 } }, { text: "アブラカラメ！", req: { a:2, k:2 } }, { text: "以上！", req: { fill: true } }] },
@@ -262,23 +278,17 @@
         { char: "サラリーマン", phrases: [{ text: "明日は会議なんで、ニンニク抜きで。", req: { n: 0 } }, { text: "以上でお願いします。", req: { fill: true } }] },
         { char: "若手社員", phrases: [{ text: "アブラ抜きで！", req: { a: 0 } }, { text: "カラメでお願いします！", req: { k: 2 } }, { text: "以上ッス！", req: { fill: true } }] },
         { char: "カップル（男）", phrases: [{ text: "彼女の前だから匂うのはちょっと…", req: { n: 0 } }, { text: "でもガッツリ食いたいんで野菜は山盛りで！", req: { y: 2 } }, { text: "これで！", req: { fill: true } }] },
-        { char: "ベテラン", phrases: [{ text: "アブラマシマシ、", req: { a: 2 } }, { text: "カラメ。", req: { k: 2 } }, { text: "……", req: { fill: true } }] },
         { char: "一般客", phrases: [{ text: "そのままお願いします。", req: { fill: true } }] },
         { char: "一般客", phrases: [{ text: "ヤサイ少なめ、ニンニクで。", req: { y: 0, n: 2 } }, { text: "以上です。", req: { fill: true } }] },
-        { char: "一般客", phrases: [{ text: "カラメのみで。", req: { k: 2 } }, { text: "あとは普通で！", req: { fill: true } }] },
-        { char: "一般客", phrases: [{ text: "ニンニク抜き、アブラ抜きで。", req: { n: 0, a: 0 } }, { text: "お願いします！", req: { fill: true } }] },
-        { char: "一般客", phrases: [{ text: "ニンニクアブラで！", req: { n: 2, a: 2 } }, { text: "以上です！", req: { fill: true } }] },
-        { char: "一般客", phrases: [{ text: "ヤサイカラメ！", req: { y: 2, k: 2 } }, { text: "以上っす！", req: { fill: true } }] }
+        { char: "一般客", phrases: [{ text: "ニンニク抜き、アブラ抜きで。", req: { n: 0, a: 0 } }, { text: "お願いします！", req: { fill: true } }] }
     ];
 
-    // --- コンセプトキャラ ---
     const specialOrders = [
         { char: "無口な男", phrases: [{ text: "……", req: {} }, { text: "……", req: {} }, { text: "（コクリと頷く）", req: { fill: true } }] },
         { char: "限界学生", phrases: [{ text: "全マシ！！", req: { n:2,y:2,a:2,k:2 } }] },
         { char: "お嬢様", phrases: [{ text: "お野菜を控えめに…", req: { y: 0 } }, { text: "油も、お味も控えめでよろしいわ。", req: { a:0, k:0 } }, { text: "よろしくて？", req: { fill: true } }] },
         { char: "泥酔客", phrases: [{ text: "カラメッ！味を濃くっ！", req: { k: 2 } }, { text: "野菜はいらねえ…", req: { y: 0 } }, { text: "……寝るわ。", req: { fill: true } }] },
-        { char: "伝説の漢", phrases: [{ text: "ニンニクマシマシ…", req: { n: 2 } }, { text: "アブラマシマシ…", req: { a: 2 } }, { text: "ヤサイ……マシだッ！", req: { y: 2 } }, { text: "押忍！", req: { fill: true } }] },
-        { char: "アスリート", phrases: [{ text: "野菜を山盛りに。", req: { y: 2 } }, { text: "脂は徹底排除！", req: { a: 0 } }, { text: "以上だ。", req: { fill: true } }] }
+        { char: "伝説の漢", phrases: [{ text: "ニンニクマシマシ…", req: { n: 2 } }, { text: "アブラマシマシ…", req: { a: 2 } }, { text: "ヤサイ……マシだッ！", req: { y: 2 } }, { text: "押忍！", req: { fill: true } }] }
     ];
 
     let score = 0, timeLeft = 90, timerInterval = null, isPlaying = false;
@@ -328,7 +338,7 @@
 
     function startCustomer() {
         currentStatus = { n:null, y:null, a:null, k:null };
-        document.querySelectorAll('.btn-zone').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.control-col').forEach(c => delete c.dataset.val); // UIの選択状態をリセット
         updateBowl(null, null, null, true); // どんぶりをリセット
         
         let pool = normalOrders;
@@ -342,6 +352,7 @@
         currentCustomer = pool[Math.floor(Math.random() * pool.length)];
         currentPhraseIndex = 0;
         currentTextStr = `【${currentCustomer.char}】\n`;
+        document.getElementById('speech-text').innerText = "";
         showPhrase();
     }
 
@@ -367,9 +378,9 @@
         const old = currentStatus[key];
         currentStatus[key] = val;
 
-        document.querySelectorAll(`.control-col[data-type="${type}"] .btn-zone`).forEach(b => {
-            b.classList.toggle('active', parseInt(b.dataset.val) === val);
-        });
+        // UI（パネル）のデータ属性を更新してCSSで色を変える
+        const col = document.querySelector(`.control-col[data-type="${type}"]`);
+        col.dataset.val = val;
 
         const phrase = currentCustomer.phrases[currentPhraseIndex];
         const target = phrase.req.fill ? 1 : phrase.req[key];
@@ -439,13 +450,13 @@
         return false;
     }
 
-    // --- 丼のビジュアル更新ロジック（アブラの高さ連動） ---
+    // --- 丼のビジュアル更新ロジック ---
     function updateBowl(key, old, val, reset=false) {
         if(reset) {
             ['yasai','ninniku','abura'].forEach(id => { 
                 const e = document.getElementById(id+'-layer'); 
                 e.style.opacity = 0; 
-                e.style.transform = (id === 'ninniku') ? 'translateX(60px) scale(0)' : 'translateX(-50%) scale(0)'; 
+                e.style.transform = (id === 'ninniku') ? 'translateX(45px) scale(0)' : 'translateX(-50%) scale(0)'; 
             });
             document.getElementById('karame-layer').style.backgroundColor = 'transparent';
             return;
@@ -454,32 +465,36 @@
         const isUp = (val > (old || 0));
         const e = document.getElementById(({n:'ninniku', y:'yasai', a:'abura', k:'karame'}[key]) + '-layer');
         
-        // カラメの処理
+        // カラメ（汁）は選ばれた時にのみ表示
         if(key === 'k') {
-            e.style.backgroundColor = val === 2 ? 'rgba(0,0,0,0.6)' : (val === 0 ? 'rgba(255,255,255,0.1)' : 'transparent');
+            if (val === 2) {
+                e.style.backgroundColor = 'rgba(100, 40, 0, 0.7)'; // 濃い汁
+            } else if (val === 1) {
+                e.style.backgroundColor = 'rgba(150, 80, 20, 0.5)'; // 普通の汁
+            } else {
+                e.style.backgroundColor = 'transparent'; // 薄め・抜き
+            }
             return;
         } 
 
-        // スケールと不透明度の決定
+        // スケールと不透明度
         const sc = key === 'y' ? (val === 0 ? 0.6 : (val === 2 ? 1.3 : 1)) : (val === 2 ? 1.4 : 1);
         const op = val === 0 ? 0 : (key === 'a' && val === 1 ? 0.7 : 1);
-        const baseTrans = key === 'n' ? 'translateX(60px) ' : 'translateX(-50%) ';
+        const baseTrans = key === 'n' ? 'translateX(45px) ' : 'translateX(-50%) ';
         
         // アブラの連動高さ計算（ヤサイの量に合わせて位置を上下させる）
         if (key === 'a' || key === 'y') {
             const aLayer = document.getElementById('abura-layer');
-            const currentYLevel = currentStatus.y === null ? 1 : currentStatus.y; // ヤサイの現在の量
-            const currentALevel = currentStatus.a === null ? 0 : currentStatus.a; // アブラの現在の量
+            const currentYLevel = currentStatus.y === null ? 1 : currentStatus.y;
+            const currentALevel = currentStatus.a === null ? 0 : currentStatus.a;
             
-            // ヤサイの量に応じた基準の高さ (bottom値)
-            let aburaBottom = 110; // 0: 少なめ
-            if (currentYLevel === 1) aburaBottom = 170; // 1: 普通
-            if (currentYLevel === 2) aburaBottom = 240; // 2: マシマシ
+            // ヤサイの量に応じた基準の高さ
+            let aburaBottom = 130; 
+            if (currentYLevel === 1) aburaBottom = 190; 
+            if (currentYLevel === 2) aburaBottom = 240; 
             
-            // アブラレイヤーに高さを適用
             aLayer.style.bottom = aburaBottom + 'px';
             
-            // ヤサイを更新した時に、すでにアブラが出ている場合はアブラのスケールも維持しつつ位置移動
             if (key === 'y' && currentALevel > 0) {
                  const aSc = currentALevel === 2 ? 1.4 : 1;
                  aLayer.style.transform = `translateX(-50%) scale(${aSc})`;
@@ -498,41 +513,48 @@
         e.style.opacity = op;
     }
 
-    // --- 独立した操作制御 ---
-    
-    // PC（クリック専用）
-    document.querySelectorAll('.btn-zone').forEach(btn => {
-        btn.addEventListener('mousedown', (e) => {
-            if (currentInputMode !== 'pc' || !isPlaying || !currentCustomer) return;
-            setVal(btn.parentElement.dataset.type, parseInt(btn.dataset.val));
-        });
-    });
-
-    // スマホ（フリック＆タップ）
+    // --- フリック操作パネルのロジック ---
     document.querySelectorAll('.control-col').forEach(col => {
         let startY = 0;
+        let isDragging = false;
         
+        // --- PC (マウス) 用 ---
+        col.addEventListener('mousedown', (e) => {
+            if (currentInputMode !== 'pc' || !isPlaying) return;
+            startY = e.clientY;
+            isDragging = true;
+        });
+
+        // --- スマホ (タッチ) 用 ---
         col.addEventListener('touchstart', (e) => {
             if (currentInputMode !== 'sp' || !isPlaying) return;
             startY = e.touches[0].clientY;
         }, {passive: true});
 
-        col.addEventListener('touchend', (e) => {
-            if (currentInputMode !== 'sp' || !isPlaying || !currentCustomer) return;
-            let endY = e.changedTouches[0].clientY;
+        // 共通のフリック判定処理
+        const handleFlick = (endY) => {
+            if (!isPlaying || !currentCustomer) return;
             let diffY = startY - endY;
             let type = col.dataset.type;
 
             if (diffY > 30) {
-                setVal(type, 2); 
+                setVal(type, 2); // 上フリック（マシ）
             } else if (diffY < -30) {
-                setVal(type, 0); 
+                setVal(type, 0); // 下フリック（抜き/少なめ）
             } else {
-                let target = e.target.closest('.btn-zone');
-                if (target) {
-                    setVal(type, parseInt(target.dataset.val));
-                }
+                setVal(type, 1); // タップ（普通）
             }
+        };
+
+        window.addEventListener('mouseup', (e) => {
+            if (currentInputMode !== 'pc' || !isDragging) return;
+            isDragging = false;
+            handleFlick(e.clientY);
+        });
+
+        col.addEventListener('touchend', (e) => {
+            if (currentInputMode !== 'sp' || !isPlaying) return;
+            handleFlick(e.changedTouches[0].clientY);
         });
     });
 
